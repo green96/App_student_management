@@ -10,7 +10,7 @@ import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
+//phuc
 
 // API base URL
 const host = Constants.expoConfig?.hostUri?.split(':')[0];
