@@ -36,11 +36,8 @@ export default function LoginScreen() {
     try {
       const loggedUser = await login(email, password);
       const userRole = loggedUser.role;
-<<<<<<< HEAD
+
       const targetRoute = userRole === 'admin' ? '/admin/dashboard' : '/tabs/HomeScreen'; // Thay bằng đường dẫn chuẩn của tab screen trong dự án của bạn (thường là /tabs hoặc /(tabs))
-=======
-      const targetRoute = userRole === 'admin' ? '/admin/dashboard' : '/tabs'; // Thay bằng đường dẫn chuẩn của tab screen trong dự án của bạn (thường là /tabs hoặc /(tabs))
->>>>>>> b8d82186a76df28bdf32031bedade91fe324bdf5
 
       if (Platform.OS === 'web') {
         // Trên Web: Dùng alert thường của trình duyệt rồi chuyển trang luôn
