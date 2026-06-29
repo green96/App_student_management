@@ -6,10 +6,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
+import { useTheme as usePaperTheme } from 'react-native-paper';
 //Platform to run on the web
 import { Alert, Linking, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
+const paperTheme = usePaperTheme();
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,7 +20,7 @@ export default function LoginScreen() {
   const { login } = useAuth();
 
 
-    const handleLogin = async () => {
+  const handleLogin = async () => {
     // Kiểm tra checkbox trước khi đăng nhập
     if (!isTermsAccepted) {
       Alert.alert('Thông báo', 'Vui lòng đồng ý với Điều khoản dịch vụ và Chính sách quyền riêng tư');
@@ -36,7 +37,6 @@ export default function LoginScreen() {
     try {
       const loggedUser = await login(email, password);
       const userRole = loggedUser.role;
-
       const targetRoute = userRole === 'admin' ? '/admin/dashboard' : '/tabs/HomeScreen'; // Thay bằng đường dẫn chuẩn của tab screen trong dự án của bạn (thường là /tabs hoặc /(tabs))
 
       if (Platform.OS === 'web') {
@@ -46,8 +46,8 @@ export default function LoginScreen() {
       } else {
         // Trên Mobile (iOS/Android): Giữ nguyên Alert.alert mượt mà
         Alert.alert(
-          'Thành công', 
-          userRole === 'admin' ? 'Đăng nhập với quyền Quản trị viên!' : 'Đăng nhập thành công!', 
+          'Thành công',
+          userRole === 'admin' ? 'Đăng nhập với quyền Quản trị viên!' : 'Đăng nhập thành công!',
           [
             {
               text: 'OK',
@@ -84,7 +84,7 @@ export default function LoginScreen() {
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <ThemedView style={styles.header}>
-          <Ionicons 
+          <Ionicons
             name='person-circle-outline'
             size={80}
             color="blue"
@@ -140,8 +140,8 @@ export default function LoginScreen() {
           </ThemedView>
 
           {/* Checkbox Điều khoản & Chính sách */}
-          <TouchableOpacity 
-            style={styles.termsContainer} 
+          <TouchableOpacity
+            style={styles.termsContainer}
             onPress={toggleTerms}
             activeOpacity={0.7}
           >
@@ -162,12 +162,13 @@ export default function LoginScreen() {
                 Chính sách quyền riêng tư
               </Text>
             </Text>
+
           </TouchableOpacity>
 
           {/* Nút Đăng nhập - Disabled khi chưa tick checkbox */}
           <TouchableOpacity
             style={[
-              styles.button, 
+              styles.button,
               (!isTermsAccepted || isLoading) && styles.buttonDisabled
             ]}
             onPress={handleLogin}
@@ -272,7 +273,7 @@ const styles = StyleSheet.create({
   },
   termsText: {
     fontSize: 13,
-    color: '#333',
+    color: '#e6dbdb',
     flex: 1,
     lineHeight: 20,
   },
