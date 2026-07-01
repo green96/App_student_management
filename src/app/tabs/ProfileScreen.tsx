@@ -1,8 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from 'expo-image-picker';
-import { useRouter } from "expo-router";
-import { useEffect, useState } from 'react';
+import { useRouter, useFocusEffect } from "expo-router";
+import { useEffect, useState, useCallback } from 'react';
 import {
     Alert,
     Image,
@@ -19,12 +19,13 @@ export default function ProfileScreen() {
     const router = useRouter();
     const { user, logout } = useAuth();
     const [avatar, setAvatar] = useState<string | null>(null);
+    const [avatarTimestamp, setAvatarTimestamp] = useState<number>(Date.now());
 
     // Dữ liệu giả định
     const studentName = user?.fullName || "Nguyễn Trường Phúc";
     const studentId = user?.studentId || "KTPM2311047";
 
-    // Danh sách menu
+    // Danh sách menu - Đã mở tất cả các mục
     const menuItems = [
         {
             id: 1,
@@ -32,41 +33,41 @@ export default function ProfileScreen() {
             title: "Thông tin sinh viên",
             onPress: () => router.push("/tabs/screens-for-profile/StudentInfoScreen"),
         },
-        // {
-        //     id: 2,
-        //     icon: "lock-closed-outline",
-        //     title: "Đổi mật khẩu",
-        //     onPress: () => router.push("/screens/ChangePasswordScreen"),
-        // },
-        // {
-        //     id: 3,
-        //     icon: "document-text-outline",
-        //     title: "Điều khoản và chính sách sử dụng",
-        //     onPress: () => router.push("/screens/TermsScreen"),
-        // },
-        // {
-        //     id: 4,
-        //     icon: "chatbubble-outline",
-        //     title: "Góp ý ứng dụng",
-        //     onPress: () => router.push("/screens/FeedbackScreen"),
-        // },
-        // {
-        //     id: 5,
-        //     icon: "notifications-outline",
-        //     title: "Thông báo",
-        //     onPress: () => router.push("/screens/NotificationScreen"),
-        // },
-        // {
-        //     id: 6,
-        //     icon: "log-out-outline",
-        //     title: "Đăng xuất",
-        //     onPress: () => {
-        //         // Xử lý đăng xuất
-        //         logout();
-        //         router.replace("/screens/LoginScreen");
-        //     },
-        //     isLogout: true,
-        // },
+        {
+            id: 2,
+            icon: "lock-closed-outline",
+            title: "Đổi mật khẩu",
+            onPress: () => router.push("/tabs/screens-for-profile/StudentInfoScreen"),
+        },
+        {
+            id: 3,
+            icon: "document-text-outline",
+            title: "Điều khoản và chính sách sử dụng",
+            onPress: () => router.push("/tabs/screens-for-profile/StudentInfoScreen"),
+        },
+        {
+            id: 4,
+            icon: "chatbubble-outline",
+            title: "Góp ý ứng dụng",
+            onPress: () => router.push("/tabs/screens-for-profile/StudentInfoScreen"),
+        },
+        {
+            id: 5,
+            icon: "notifications-outline",
+            title: "Thông báo",
+            onPress: () => router.push("/tabs/screens-for-profile/StudentInfoScreen"),
+        },
+        {
+            id: 6,
+            icon: "log-out-outline",
+            title: "Đăng xuất",
+            onPress: () => {
+                // Xử lý đăng xuất
+                logout();
+                router.replace("/login");
+            },
+            isLogout: true,
+        },
     ];
 
     const pickImage = async () => {
@@ -93,31 +94,47 @@ export default function ProfileScreen() {
             const uri = result.assets[0].uri;
 
             setAvatar(uri);
+            setAvatarTimestamp(Date.now());
 
             await AsyncStorage.setItem(
                 'student_avatar',
                 uri
             );
+            // Lưu timestamp để biết avatar đã được cập nhật
+            await AsyncStorage.setItem(
+                'student_avatar_timestamp',
+                Date.now().toString()
+            );
         }
     };
-    useEffect(() => {
-        loadAvatar();
-    }, []);
 
     const loadAvatar = async () => {
         try {
-            const saved =
-                await AsyncStorage.getItem(
-                    'student_avatar'
-                );
-
+            const saved = await AsyncStorage.getItem('student_avatar');
+            const timestamp = await AsyncStorage.getItem('student_avatar_timestamp');
+            
             if (saved) {
                 setAvatar(saved);
+                if (timestamp) {
+                    setAvatarTimestamp(parseInt(timestamp));
+                }
             }
         } catch (err) {
             console.log(err);
         }
     };
+
+    // Load avatar khi component mount
+    useEffect(() => {
+        loadAvatar();
+    }, []);
+
+    // Load lại avatar khi màn hình được focus (quay lại từ màn hình khác)
+    useFocusEffect(
+        useCallback(() => {
+            loadAvatar();
+        }, [])
+    );
 
     return (
         <SafeAreaView style={styles.container}>
@@ -128,7 +145,9 @@ export default function ProfileScreen() {
                         <View style={styles.avatar}>
                             {avatar ? (
                                 <Image
-                                    source={{ uri: avatar }}
+                                    source={{ 
+                                        uri: avatar + '?t=' + avatarTimestamp // Thêm timestamp để refresh cache
+                                    }}
                                     style={styles.avatarImage}
                                 />
                             ) : (
@@ -199,9 +218,6 @@ export default function ProfileScreen() {
 
                 <View style={styles.footer} />
             </ScrollView>
-
-            {/* Bottom Navigation */}
-
         </SafeAreaView>
     );
 }
@@ -321,7 +337,7 @@ const styles = StyleSheet.create({
     versionContainer: {
         alignItems: "center",
         marginTop: 20,
-        marginBottom: 80,
+        marginBottom: 20,
     },
 
     versionText: {
@@ -331,37 +347,5 @@ const styles = StyleSheet.create({
 
     footer: {
         height: 20,
-    },
-
-    // Bottom Navigation
-    bottomNav: {
-        flexDirection: "row",
-        backgroundColor: "#FFF",
-        paddingVertical: 10,
-        paddingHorizontal: 10,
-        borderTopWidth: 1,
-        borderTopColor: "#E8E8E8",
-        position: "absolute",
-        bottom: 0,
-        left: 0,
-        right: 0,
-    },
-
-    bottomNavItem: {
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-        paddingVertical: 4,
-    },
-
-    bottomNavLabel: {
-        fontSize: 11,
-        color: "#999",
-        marginTop: 2,
-    },
-
-    bottomNavLabelActive: {
-        color: "#214D8A",
-        fontWeight: "600",
     },
 });

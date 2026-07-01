@@ -1,44 +1,141 @@
 // src/contexts/AuthContext.tsx
-import { API_URL } from '@/utils/api'; //Import hàm gọi API tới backend.
-import AsyncStorage from '@react-native-async-storage/async-storage'; //AsyncStorage: Dùng để lưu dữ liệu vào bộ nhớ điện thoại. ==> Khi tắt app mở lại vẫn còn.
+import { API_URL } from '@/utils/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-//Khai báo kiểu dữ liệu User ==> Nó quy định một User phải có những thuộc tính nào.
-//Dấu ? : Thuộc tính này có thể có hoặc không.
+// Cập nhật interface User với đầy đủ các trường từ CSDL
 interface User {
+  id?: string;
   username?: string;
   fullName?: string;
   studentId?: string;
-  dob?: string;
-  faculty?: string;
-  class?: string;
   email?: string;
   phone?: string;
   role?: string;
+  avatar?: string;
+  // Thông tin học vấn
+  faculty?: string;
+  facultyId?: string;
+  departmentId?: string;
+  class?: string;
+  course?: string;
+  // Thông tin cá nhân
+  dateOfBirth?: string;
+  placeOfBirth?: string;
+  address?: string;
+  status?: string;
+  gender?: string;
+  // Academic Info
+  academicInfo?: {
+    enrollmentDate?: string;
+    trainingLevel?: string;
+    trainingType?: string;
+    courseYear?: string;
+    base?: string;
+    profileCode?: string;
+  };
+  // Personal Info
+  personalInfo?: {
+    ethnicity?: string;
+    religion?: string;
+    nationality?: string;
+    region?: string;
+    cccd?: string;
+    cccdIssueDate?: string;
+    cccdIssuePlace?: string;
+    object?: string;
+    policyType?: string;
+    unionJoinDate?: string;
+    partyJoinDate?: string;
+    permanentResidence?: string;
+    bankName?: string;
+    bankBranch?: string;
+    accountHolder?: string;
+    accountNumber?: string;
+  };
+  // Family Info
+  familyInfo?: {
+    father?: {
+      name?: string;
+      birthYear?: string;
+      occupation?: string;
+      nationality?: string;
+      ethnicity?: string;
+      religion?: string;
+      workplace?: string;
+      position?: string;
+      phone?: string;
+      permanentResidence?: string;
+      currentResidence?: string;
+    };
+    mother?: {
+      name?: string;
+      birthYear?: string;
+      occupation?: string;
+      nationality?: string;
+      ethnicity?: string;
+      religion?: string;
+      workplace?: string;
+      position?: string;
+      phone?: string;
+      permanentResidence?: string;
+      currentResidence?: string;
+    };
+  };
   [key: string]: any;
 }
 
-//Khai báo cấu trúc của Context.
 interface AuthContextType {
-  user: User | null;//Nếu chưa đăng nhập: user:null
-  login: (email: string, password: string) => Promise<User>;//Hàm đăng nhập. nhận email pass trả Promise.
-  logout: () => Promise<void>;//Hàm đăng xuất.
-  updateUser: (userData: Partial<User>) => void;//Partial<User>:Chỉ cần truyền những trường muốn sửa thay vì toàn bộ user
+  user: User | null;
+  login: (email: string, password: string) => Promise<User>;
+  logout: () => Promise<void>;
+  updateUser: (userData: Partial<User>) => void;
+  refreshUser: () => Promise<void>; // Thêm hàm refresh
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-//Đây là component chứa dữ liệu đăng nhập.
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);//Nghĩa là chưa đăng nhập. user = null
+  const [user, setUser] = useState<User | null>(null);
+
+  // Hàm lấy thông tin user đầy đủ từ API
+  const fetchFullUserProfile = async (userId: string): Promise<User | null> => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await fetch(`${API_URL}/users/${userId}/profile`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        return data.user || data;
+      }
+      return null;
+    } catch (error) {
+      console.warn('Fetch full profile failed:', error);
+      return null;
+    }
+  };
 
   useEffect(() => {
     const loadUser = async () => {
       try {
-        //Gửi request đến backend và await nó trả 
         const savedUser = await AsyncStorage.getItem('user');
         if (savedUser) {
-          //Chuyển dữ liệu backend sang đúng kiểu User.
-          setUser(JSON.parse(savedUser));
+          const parsedUser = JSON.parse(savedUser);
+          setUser(parsedUser);
+          
+          // Nếu có userId, lấy thông tin đầy đủ
+          if (parsedUser.id || parsedUser._id) {
+            const userId = parsedUser.id || parsedUser._id;
+            const fullProfile = await fetchFullUserProfile(userId);
+            if (fullProfile) {
+              setUser(fullProfile);
+              await AsyncStorage.setItem('user', JSON.stringify(fullProfile));
+            }
+          }
         }
       } catch (error) {
         console.warn('Auth load user failed:', error);
@@ -63,17 +160,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error(data.message || 'Đăng nhập thất bại');
     }
 
-    const loggedUser: User = data.user;
-    await AsyncStorage.setItem('user', JSON.stringify(loggedUser));//Lưu user xuống bộ nhớ điện thoại.
+    let loggedUser: User = data.user;
+    
+    // Lấy thông tin đầy đủ của user
+    if (loggedUser.id || loggedUser._id) {
+      const userId = loggedUser.id || loggedUser._id;
+      const fullProfile = await fetchFullUserProfile(userId);
+      if (fullProfile) {
+        loggedUser = { ...loggedUser, ...fullProfile };
+      }
+    }
+    
+    await AsyncStorage.setItem('user', JSON.stringify(loggedUser));
     if (data.token) {
       await AsyncStorage.setItem('token', data.token);
     }
-    setUser(loggedUser);//gọi loggedUser đã lưu trong phone ra
+    setUser(loggedUser);
     return loggedUser;
   };
 
   const logout = async () => {
-    //reset user = null và remove nó khỏi bộ nhớ điện thoại
     setUser(null);
     await AsyncStorage.removeItem('user');
     await AsyncStorage.removeItem('token');
@@ -82,24 +188,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const updateUser = (userData: Partial<User>) => {
     if (user) {
       const updatedUser = { ...user, ...userData };
-      setUser(updatedUser);//sao chép user và ghi đè lên từ updatedUser
+      setUser(updatedUser);
       AsyncStorage.setItem('user', JSON.stringify(updatedUser)).catch((err) => {
         console.warn('Auth update user save failed:', err);
       });
     }
   };
 
-  //Đưa các dữ liệu và hàm ra ngoài.value={{ user, login, logout, updateUser 
+  // Hàm refresh để lấy lại thông tin user mới nhất
+  const refreshUser = async () => {
+    if (user && (user.id || user._id)) {
+      const userId = user.id || user._id;
+      const fullProfile = await fetchFullUserProfile(userId);
+      if (fullProfile) {
+        setUser(fullProfile);
+        await AsyncStorage.setItem('user', JSON.stringify(fullProfile));
+      }
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, login, logout, updateUser, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-// Custom Hook dùng để lấy dữ liệu từ AuthContext.
-// Được gọi trong các component (ví dụ HomeScreen) để lấy user,
-// login, logout, updateUser, restoreSession.
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
