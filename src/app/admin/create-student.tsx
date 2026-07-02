@@ -560,11 +560,19 @@ export default function CreateStudentScreen() {
         );
     }
 
+    const  handleback = () => {
+        if(router.canGoBack()){
+            router.back();
+        }else{
+            router.replace('/admin/dashboard');
+        }
+    }
+
     return (
         <ScrollView style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                <TouchableOpacity onPress={handleback} style={styles.backButton}>
                     <Ionicons name="arrow-back" size={28} color="#333" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Tạo tài khoản sinh viên</Text>
@@ -607,7 +615,7 @@ export default function CreateStudentScreen() {
                         </View>
                     </View>
 
-                 
+
 
                     {/* Chọn Khoa */}
                     <View style={styles.pickerContainer}>
@@ -695,7 +703,6 @@ export default function CreateStudentScreen() {
                             )}
                         </View>
                     </View>
-    {/* Số thứ tự */}
                     <View>
                         <TextInput
                             label="Số thứ tự (3 số, VD: 001, 002,...)"
@@ -727,10 +734,10 @@ export default function CreateStudentScreen() {
                                 />
                             }
                         />
-                        {isSequenceDuplicate() && (
-                            <Text style={styles.errorText}>⚠️ STT này đã tồn tại! Vui lòng chọn STT khác.</Text>
-                        )}
 
+                        {isSequenceDuplicate() && (
+                            <Text style={styles.errorText}>⚠️ STT này đã tồn tại! Vui lòng chọn STT khác</Text>
+                        )}
                         {/* Chỉ hiển thị "hợp lệ" khi STT có đủ 3 số và KHÔNG bị trùng */}
                         {formData.sequenceNumber &&
                             formData.sequenceNumber.length === 3 &&
@@ -744,6 +751,7 @@ export default function CreateStudentScreen() {
                             formData.sequenceNumber.length < 3 && (
                                 <Text style={styles.warningText}>⚠️ Cần nhập đủ 3 số (VD: 001)</Text>
                             )}
+
                     </View>
                     {/* MSSV tự động */}
                     <TextInput
