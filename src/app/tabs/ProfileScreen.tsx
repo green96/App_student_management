@@ -30,42 +30,31 @@ export default function ProfileScreen() {
     const studentName = student?.fullName || user?.fullName || "Nguyễn Trường Phúc";
     const studentId = student?.studentId || user?.studentId || "KTPM2311047";
 
-   const menuItems = [
+    const menuItems = [
         {
             id: 1,
             icon: "person-outline",
             title: "Thông tin sinh viên",
-            // Giữ nguyên, không truyền view thì sẽ hiển thị thông tin sinh viên
+
             onPress: () => router.push("/tabs/screens-for-profile/StudentInfoScreen"),
         },
         {
             id: 2,
             title: 'Đổi mật khẩu',
             icon: 'lock-closed-outline',
-            onPress: () => router.push({
-                pathname: '/tabs/screens-for-profile/StudentInfoScreen',
-                params: { view: 'password' } // ✅ Kích hoạt giao diện đổi mật khẩu
-            }),
+            onPress: () => router.push("/tabs/screens-for-profile/ChangePasswordScreen"),
         },
         {
             id: 3,
             icon: "document-text-outline",
             title: "Điều khoản và chính sách sử dụng",
-            // ✅ Kích hoạt hành động mở link web điều khoản
-            onPress: () => router.push({
-                pathname: '/tabs/screens-for-profile/StudentInfoScreen',
-                params: { view: 'terms' } 
-            }),
+           onPress: () => router.push("/tabs/screens-for-profile/TermsScreen"),
         },
         {
             id: 4,
             icon: "chatbubble-outline",
             title: "Góp ý ứng dụng",
-            // ✅ Kích hoạt giao diện form Góp ý
-            onPress: () => router.push({
-                pathname: '/tabs/screens-for-profile/StudentInfoScreen',
-                params: { view: 'feedback' } 
-            }),
+            onPress: () => router.push("/tabs/screens-for-profile/FeedbackScreen"),
         },
         {
             id: 5,
@@ -110,7 +99,7 @@ export default function ProfileScreen() {
             if (data.success) {
                 // 3. Extract the nested student object
                 setStudent(data.student);
-                
+
                 // 4. Cập nhật avatar từ student data
                 if (data.student?.avatar) {
                     let avatarUrl = data.student.avatar;
@@ -181,10 +170,10 @@ export default function ProfileScreen() {
             const uri = asset.uri;
             const fileName = uri.split('/').pop() || 'avatar.jpg';
             const fileType = asset.type || 'image/jpeg';
-            
+
             // Lấy token từ AsyncStorage
             const token = await AsyncStorage.getItem('token');
-            
+
             formData.append('avatar', {
                 uri: uri,
                 type: fileType,
@@ -225,17 +214,17 @@ export default function ProfileScreen() {
             if (!avatarUrl.startsWith('http')) {
                 avatarUrl = `${API_URL}${avatarUrl}`;
             }
-            
+
             setAvatar(avatarUrl);
-            
+
             // Lưu vào AsyncStorage
             await AsyncStorage.setItem('student_avatar', avatarUrl);
-            
+
             // Cập nhật student state
             if (student) {
                 setStudent({ ...student, avatar: avatarUrl });
             }
-            
+
             // Cập nhật user context nếu có
             if (user) {
                 user.avatar = avatarUrl;
@@ -245,7 +234,7 @@ export default function ProfileScreen() {
         } catch (error: any) {
             console.error('Upload error:', error);
             Alert.alert(
-                'Lỗi upload', 
+                'Lỗi upload',
                 error.message || 'Không thể tải ảnh lên. Vui lòng thử lại.'
             );
         } finally {
@@ -284,18 +273,18 @@ export default function ProfileScreen() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView showsVerticalScrollIndicator={true}>
                 <View style={styles.header}>
                     <View style={styles.avatarContainer}>
                         <View style={styles.avatar}>
                             <Image
-                                         source={
-                                             student?.avatar
-                                               ? { uri: student.avatar }
-                                               : require('../../../assets/images/Nhan_imported_image/account_circle_withbackground.png')
-                                           }
-                                           style={styles.avatar}
-                                       />
+                                source={
+                                    student?.avatar
+                                        ? { uri: student.avatar }
+                                        : require('../../../assets/images/Nhan_imported_image/account_circle_withbackground.png')
+                                }
+                                style={styles.avatar}
+                            />
                         </View>
                         <TouchableOpacity
                             style={styles.editButton}
@@ -430,7 +419,7 @@ const styles = StyleSheet.create({
         marginTop: 4,
     },
     menuContainer: {
-        marginTop: 20,
+        marginTop: -15,
         marginHorizontal: 16,
         backgroundColor: "#FFF",
         borderRadius: 16,

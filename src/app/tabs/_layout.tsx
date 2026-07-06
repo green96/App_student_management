@@ -63,6 +63,27 @@ export default function TabLayout() {
   }}
 />
 
+<Tabs.Screen
+  name="screens-for-profile/ChangePasswordScreen"
+  options={{
+    href: null,
+  }}
+/>
+
+<Tabs.Screen
+  name="screens-for-profile/FeedbackScreen"
+  options={{
+    href: null,
+  }}
+/>
+
+<Tabs.Screen
+  name="screens-for-profile/TermsScreen"
+  options={{
+    href: null,
+  }}
+/>
+
     </Tabs>
   );
 }

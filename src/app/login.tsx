@@ -6,19 +6,22 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { useTheme as usePaperTheme } from 'react-native-paper';
-//Platform to run on the web
+// Platform to run on the web
 import { Alert, Linking, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-const paperTheme = usePaperTheme();
+
+// ✅ Xóa dòng này: const paperTheme = usePaperTheme();
+
 export default function LoginScreen() {
+  // ✅ Nếu cần sử dụng usePaperTheme, gọi nó ở đây (bên trong component)
+  // const paperTheme = usePaperTheme();
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isTermsAccepted, setIsTermsAccepted] = useState(false); // Thêm state cho checkbox
+  const [isTermsAccepted, setIsTermsAccepted] = useState(false);
   const { login } = useAuth();
-
 
   const handleLogin = async () => {
     // Kiểm tra checkbox trước khi đăng nhập
@@ -37,14 +40,12 @@ export default function LoginScreen() {
     try {
       const loggedUser = await login(email, password);
       const userRole = loggedUser.role;
-      const targetRoute = userRole === 'admin' ? '/admin/dashboard' : '/tabs/HomeScreen'; // Thay bằng đường dẫn chuẩn của tab screen trong dự án của bạn (thường là /tabs hoặc /(tabs))
+      const targetRoute = userRole === 'admin' ? '/admin/dashboard' : '/tabs/HomeScreen';
 
       if (Platform.OS === 'web') {
-        // Trên Web: Dùng alert thường của trình duyệt rồi chuyển trang luôn
         alert(userRole === 'admin' ? 'Đăng nhập với quyền Quản trị viên thành công!' : 'Đăng nhập thành công!');
         router.replace(targetRoute);
       } else {
-        // Trên Mobile (iOS/Android): Giữ nguyên Alert.alert mượt mà
         Alert.alert(
           'Thành công',
           userRole === 'admin' ? 'Đăng nhập với quyền Quản trị viên!' : 'Đăng nhập thành công!',
@@ -67,6 +68,7 @@ export default function LoginScreen() {
       setIsLoading(false);
     }
   };
+
   const openTerms = () => {
     Linking.openURL('https://www.termsfeed.com/live/a3b5b4ca-4410-4599-9a25-b502d4e494a4');
   };
@@ -75,7 +77,6 @@ export default function LoginScreen() {
     Linking.openURL('https://www.termsfeed.com/live/a3b5b4ca-4410-4599-9a25-b502d4e494a4');
   };
 
-  // Toggle checkbox
   const toggleTerms = () => {
     setIsTermsAccepted(!isTermsAccepted);
   };
@@ -162,7 +163,6 @@ export default function LoginScreen() {
                 Chính sách quyền riêng tư
               </Text>
             </Text>
-
           </TouchableOpacity>
 
           {/* Nút Đăng nhập - Disabled khi chưa tick checkbox */}
@@ -259,7 +259,6 @@ const styles = StyleSheet.create({
   eyeIcon: {
     paddingHorizontal: Spacing.two,
   },
-  // Checkbox styles
   termsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -277,7 +276,6 @@ const styles = StyleSheet.create({
     flex: 1,
     lineHeight: 20,
   },
-  // Button styles
   button: {
     backgroundColor: '#007AFF',
     paddingVertical: Spacing.three,

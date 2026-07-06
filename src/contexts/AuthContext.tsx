@@ -87,19 +87,20 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  token:string | null;
+  token: string | null;
+  isLoading: boolean; // Thêm isLoading vào interface
   login: (email: string, password: string) => Promise<User>;
   logout: () => Promise<void>;
   updateUser: (userData: Partial<User>) => void;
-  refreshUser: () => Promise<void>; // Thêm hàm refresh
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] =
-  useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true); // Thêm state isLoading
 
   // Hàm lấy thông tin user đầy đủ từ API
   const fetchFullUserProfile = async (userId: string): Promise<User | null> => {
@@ -125,6 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const loadUser = async () => {
       try {
+        setIsLoading(true); // Bắt đầu loading
         const savedUser = await AsyncStorage.getItem('user');
         if (savedUser) {
           const parsedUser = JSON.parse(savedUser);
@@ -142,6 +144,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       } catch (error) {
         console.warn('Auth load user failed:', error);
+      } finally {
+        setIsLoading(false); // Kết thúc loading
       }
     };
 
@@ -149,43 +153,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string): Promise<User> => {
-    const response = await fetch(`${API_URL}/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email: email.trim(), password }),
-    });
+    try {
+      setIsLoading(true); // Bắt đầu loading khi login
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: email.trim(), password }),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (!data.success) {
-      throw new Error(data.message || 'Đăng nhập thất bại');
-    }
-
-    let loggedUser: User = data.user;
-    
-    // Lấy thông tin đầy đủ của user
-    if (loggedUser.id || loggedUser._id) {
-      const userId = loggedUser.id || loggedUser._id;
-      const fullProfile = await fetchFullUserProfile(userId);
-      if (fullProfile) {
-        loggedUser = { ...loggedUser, ...fullProfile };
+      if (!data.success) {
+        throw new Error(data.message || 'Đăng nhập thất bại');
       }
+
+      let loggedUser: User = data.user;
+      
+      // Lấy thông tin đầy đủ của user
+      if (loggedUser.id || loggedUser._id) {
+        const userId = loggedUser.id || loggedUser._id;
+        const fullProfile = await fetchFullUserProfile(userId);
+        if (fullProfile) {
+          loggedUser = { ...loggedUser, ...fullProfile };
+        }
+      }
+      
+      await AsyncStorage.setItem('user', JSON.stringify(loggedUser));
+      if (data.token) {
+        await AsyncStorage.setItem('token', data.token);
+      }
+      setUser(loggedUser);
+      return loggedUser;
+    } finally {
+      setIsLoading(false); // Kết thúc loading
     }
-    
-    await AsyncStorage.setItem('user', JSON.stringify(loggedUser));
-    if (data.token) {
-      await AsyncStorage.setItem('token', data.token);
-    }
-    setUser(loggedUser);
-    return loggedUser;
   };
 
   const logout = async () => {
-    setUser(null);
-    await AsyncStorage.removeItem('user');
-    await AsyncStorage.removeItem('token');
+    try {
+      setIsLoading(true); // Bắt đầu loading khi logout
+      setUser(null);
+      await AsyncStorage.removeItem('user');
+      await AsyncStorage.removeItem('token');
+    } finally {
+      setIsLoading(false); // Kết thúc loading
+    }
   };
 
   const updateUser = (userData: Partial<User>) => {
@@ -201,17 +215,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Hàm refresh để lấy lại thông tin user mới nhất
   const refreshUser = async () => {
     if (user && (user.id || user._id)) {
-      const userId = user.id || user._id;
-      const fullProfile = await fetchFullUserProfile(userId);
-      if (fullProfile) {
-        setUser(fullProfile);
-        await AsyncStorage.setItem('user', JSON.stringify(fullProfile));
+      try {
+        setIsLoading(true); // Bắt đầu loading khi refresh
+        const userId = user.id || user._id;
+        const fullProfile = await fetchFullUserProfile(userId);
+        if (fullProfile) {
+          setUser(fullProfile);
+          await AsyncStorage.setItem('user', JSON.stringify(fullProfile));
+        }
+      } finally {
+        setIsLoading(false); // Kết thúc loading
       }
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, token , login, logout, updateUser, refreshUser }}>
+    <AuthContext.Provider value={{ user, token, isLoading, login, logout, updateUser, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
