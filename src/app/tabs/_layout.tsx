@@ -49,54 +49,67 @@ export default function TabLayout() {
           ),
         }}
       />
-<Tabs.Screen
-  name="settings"
-  options={{
-    href: null,
-  }}
-/>
-{/* href: null, ==> ẩn tab NewsScreen khỏi tabBar */}
-<Tabs.Screen
-  name="NewsScreen"
-  options={{
-    href: null,
-  }}
-/>
+      <Tabs.Screen
+        name="settings"
+        options={{
+          href: null,
+        }}
+      />
+      {/* href: null, ==> ẩn tab NewsScreen khỏi tabBar */}
+      <Tabs.Screen
+        name="NewsScreen"
+        options={{
+          href: null,
+        }}
+      />
 
-<Tabs.Screen
-  name="screens-for-profile/StudentInfoScreen"
-  options={{
-    href: null,
-  }}
-/>
+      <Tabs.Screen
+        name="screens-for-profile/StudentInfoScreen"
+        options={{
+          href: null,
+        }}
+      />
 
-<Tabs.Screen
-  name="screens-for-profile/ChangePasswordScreen"
-  options={{
-    href: null,
-  }}
-/>
+      <Tabs.Screen
+        name="screens-for-profile/ChangePasswordScreen"
+        options={{
+          href: null,
+        }}
+      />
 
-<Tabs.Screen
-  name="screens-for-profile/FeedbackScreen"
-  options={{
-    href: null,
-  }}
-/>
+      <Tabs.Screen
+        name="screens-for-profile/FeedbackScreen"
+        options={{
+          href: null,
+        }}
+      />
 
-<Tabs.Screen
-  name="screens-for-profile/TermsScreen"
-  options={{
-    href: null,
-  }}
-/>
+      <Tabs.Screen
+        name="screens-for-profile/TermsScreen"
+        options={{
+          href: null,
+        }}
+      />
 
-<Tabs.Screen
-  name="AllFeaturesScreen"
-  options={{
-    href: null,
-  }}
-/>
+      <Tabs.Screen
+        name="AllFeaturesScreen"
+        options={{
+          href: null,
+        }}
+      />
+
+
+       <Tabs.Screen
+        name="CurriculumStudentScreen"
+        options={{
+          href: null,
+        }}
+      />
+     
     </Tabs>
+
+
+
+     
   );
 }

@@ -16,6 +16,7 @@ const studentRoutes = require('./routes/studentRoutes');
 const scheduleRoutes = require('./routes/scheduleRoutes');
 const newsRoutes = require("./routes/newsRoutes");
 const feedbackRoutes = require('./routes/feedbackRoutes');
+const curriculumRoutes = require('./routes/curriculumRoutes'); 
 
 const app = express();
 
@@ -54,6 +55,9 @@ app.use('/api', studentRoutes);
 app.use('/api/schedules', scheduleRoutes);
 app.use("/api/news", newsRoutes);
 app.use('/api/feedback', feedbackRoutes);
+app.use('/api/curriculum', curriculumRoutes);
+
+
 // Test
 app.get('/api/test', (req, res) => {
   res.json({

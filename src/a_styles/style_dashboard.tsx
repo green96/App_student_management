@@ -66,7 +66,7 @@ export const styles = StyleSheet.create({
   // Body Styles
   body: {
     flex: 1,
-    padding: 20,
+    padding: 15,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -85,7 +85,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   menuCard: {
-    width: '48%',
+    width: '48%', //edit card grid
     backgroundColor: '#fff',
     padding: 18,
     borderRadius: 12,

@@ -10,6 +10,7 @@ export default function AdminLayout() {
       <Stack.Screen name="courses" options={{ title: 'Quản lý môn học' }} />
       <Stack.Screen name="schedule" options={{ title: 'Quản lý lịch học' }} />
       <Stack.Screen name="FeedbackManagementScreen" options={{ title: 'Quản lý Góp ý' }} />
+      <Stack.Screen name="mng_frameworkprogram" options={{ title: 'Quản lý Chương trình khung' }} />
     </Stack>
   );
 }

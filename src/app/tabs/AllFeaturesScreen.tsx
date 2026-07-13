@@ -51,7 +51,7 @@ export default function AllFeaturesScreen() {
     title: "Chương\ntrình khung",
     icon: "book",
     color: "#D63B3B",
-    href: "Program",
+    href: "../tabs/CurriculumStudentScreen",
   },
   {
     title: "Thống kê\nđiểm danh",
@@ -73,6 +73,7 @@ export default function AllFeaturesScreen() {
   },
 ];
 
+ 
   return (
 <SafeAreaView style={globalStyles.container}>
   {/* Header */}
@@ -95,8 +96,9 @@ export default function AllFeaturesScreen() {
         <TouchableOpacity
           key={index}
           style={styles.item}
-          onPress={() => router.push("../tabs/NewsScreen")}
+          onPress={() => router.push(item.href as any)}
         >
+          
           <Ionicons
             name={item.icon as keyof typeof Ionicons.glyphMap}
             size={26}

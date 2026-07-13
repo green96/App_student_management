@@ -1,6 +1,6 @@
 //Import thư viện
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router"; // Thay đổi import
+import { useRouter } from "expo-router";  
 import { useEffect, useRef, useState } from "react";
 import {
   Animated,
@@ -92,9 +92,9 @@ export default function HomeScreen() {
     },
     {
       icon: "book-outline",
-      title: "Chương trình",
+      title: "Chương trình khung",
       color: "#EA5455",
-      href: "/screens/ProgramScreen",
+      href: "../tabs/CurriculumStudentScreen",
     },
     {
       icon: "person-outline",

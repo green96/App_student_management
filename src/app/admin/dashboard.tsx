@@ -162,10 +162,22 @@ export default function AdminDashboard() {
               onPress={() => router.push('/admin/FeedbackManagementScreen')}
             >
               <View style={styles.menuIconWrapper}>
-                <Ionicons name="calendar-outline" size={32} color="#16d6e0" />
+                <Ionicons name="chatbox-ellipses" size={32} color="#16d6e0" />
               </View>
               <Text style={styles.menuTitle}>Quản lý Góp ý</Text>
               <Text style={styles.menuDesc}>Góp ý sinh viên</Text>
+            </TouchableOpacity>
+
+
+            <TouchableOpacity
+              style={styles.menuCard}
+              onPress={() => router.push('/admin/mng_frameworkprogram')}
+            >
+              <View style={styles.menuIconWrapper}>
+                <Ionicons name="library-outline" size={32} color="#16d6e0" />
+              </View>
+              <Text style={styles.menuTitle}>Quản lý Chương trình khung</Text>
+              <Text style={styles.menuDesc}>CHƯƠNG TRÌNH KHUNG</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

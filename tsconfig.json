@@ -15,5 +15,5 @@
     "expo-env.d.ts",
     "src/app/index.jsx",
     "src/types/**/*.d.ts"
-  ]
+, "src/app/tabs/HomeScreen.jsx"  ]
 }

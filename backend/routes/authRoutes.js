@@ -4,7 +4,7 @@ const router = express.Router();
 const { protect, isAdmin } = require('../middleware/authMiddleware');
 const upload = require('../middleware/upload'); // ✅ Import upload
 const {
-  register,
+ 
   login,
   getMe,
   createStudentAccount,
@@ -23,7 +23,7 @@ const {
 } = require('../controllers/updateRequestController');
 
 // Public routes
-router.post('/register', register);
+ 
 router.post('/login', login);
 
 // Protected routes

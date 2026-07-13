@@ -78,12 +78,18 @@ export default function NewsScreen() {
       </View>
     );
   }
-
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      
+    
+      router.replace('/tabs/AllFeaturesScreen');
+    }
+  };
   // hiển thị card danh sách tin tức bằng FlatList nếu thành công fetch dữ liệu
   return (
     <SafeAreaView style={globalStyles.container}>
       <View style={globalStyles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity onPress={handleBack}>
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={globalStyles.headerTitle}>Tin tức</Text>
